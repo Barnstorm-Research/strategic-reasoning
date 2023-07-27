@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  pipeline:
+    build:
+      context: ./
+    stdin_open: true 
+    tty: true
+    environment:
+      - AWS_ACCESS_KEY=value
+      - AWS_SECRET_KEY=value
+      - S3_PREFIX=value
+      - S3_ENDPOINT_URL=value
+      - S3_REGION=value
+      - NEWSCATCHER_API_KEY=value
+    volumes:
+      - type: bind
+        source: ./src
+        target: /home/src
