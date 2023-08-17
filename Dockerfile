@@ -14,4 +14,5 @@ RUN pip3 install -r requirements.txt
 
 WORKDIR /home/src
 
-CMD ["bash"]
+# CMD ["bash"]
+CMD ["python", "harvest.py"]

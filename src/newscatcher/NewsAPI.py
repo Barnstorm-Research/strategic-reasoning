@@ -4,6 +4,7 @@ import os
 import json
 import requests
 import pandas as pd
+from io import StringIO
 
 class NewsAPI:
     def __init__(self, api_key):
@@ -17,14 +18,15 @@ class NewsAPI:
             os.makedirs(self.work_folder)
         os.chdir(self.work_folder)
 
-    def make_request(self, query, lang='en', to_rank=10000, page_size=100, from_date=None):
+    def make_request(self, query, lang='en', to_rank=10000, page_size=100, from_date=None, to_date=None):
         params = {
             'q': query,
             'lang': lang,
             'to_rank': to_rank,
             'page_size': page_size,
             'page': 1,
-            'from': from_date
+            'from': from_date,
+            'to': to_date
         }
         self.all_news_articles = []  # Reset previous articles
 
@@ -52,16 +54,24 @@ class NewsAPI:
 
         print(f'Number of extracted articles => {str(len(self.all_news_articles))}')
 
-    def make_requests(self, queries, lang='en', to_rank=10000, page_size=100, from_date=None):
+    def make_requests(self, queries, lang='en', to_rank=10000, page_size=100, from_date=None, to_date=None):
         for query in queries:
-            self.make_request(query, lang, to_rank, page_size, from_date)
+            self.make_request(query, lang, to_rank, page_size, from_date, to_date)
 
-    def generate_csv(self, filename):
+    def generate_csv(self):
         field_names = list(self.all_news_articles[0].keys())
-        with open(filename, 'w', encoding="utf-8", newline='') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=field_names, delimiter=";")
-            writer.writeheader()
-            writer.writerows(self.all_news_articles)
+        csv_data = StringIO()
+        # with open(filename, 'w', encoding="utf-8", newline='') as csvfile:
+        writer = csv.DictWriter(csv_data, fieldnames=field_names, delimiter=";")
+        writer.writeheader()
+        writer.writerows(self.all_news_articles)
+
+        # Upload the CSV data to a DataFrame
+        csv_data.seek(0)
+        df = pd.read_csv(csv_data, sep=";")
+
+        return df
+        # s3_helper.writeFile(filename, csv_data.getvalue())
 
     def generate_pandas_csv(self, filename):
         pandas_table = pd.DataFrame(self.all_news_articles)

@@ -19,9 +19,10 @@ class s3Helper:
         return self.fs.ls("{0}{1}".format(self._bucket,additionalPath))
     
     def writeFile(self,filePath,df):
-        bytes_to_write = df.to_csv(None).encode()
+        csv_data = df.to_csv(index=False).encode() # Convert DataFrame to CSV bytes
+        # bytes_to_write = df.to_csv(None).encode() #AttributeError: 'str' object has no attribute 'to_csv'
         with self.fs.open(filePath, 'wb') as f:
-            f.write(bytes_to_write)
+            f.write(csv_data)
         return
     
     def readFile(self,filePath):
